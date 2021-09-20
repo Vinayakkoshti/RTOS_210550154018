@@ -25,17 +25,15 @@ TimeOut_t xTimeOut1;
 TimeOut_t xTimeOut2;
 TimeOut_t xTimeOut3;
 
+void *const timer_Id;
+TimerHandle_t my_timer_handle;
 
-//define timer
-//#define NUM_TIMERS 5
-//TimerHandle_t xTimers[ NUM_TIMERS ];
-/*
-TimerCallbackFunction_t vTimerCallback (xTimers)
+void myTimerCallback(TimerHandle_t xTimer)
 {
-    //to trigger task3 makin
-    vTaskPrioritySet(Handler3,20);
+    printf("Inside OneShot Timer callback\n");
 }
-*/
+
+
 void app_main(void)
 {
 /*
@@ -82,22 +80,18 @@ void Task_2(void *argument)
     }
  }
 
+void *const timer_id;
+TimerHandle_t timer_handle;
 
 void Task_3(void *argument)
 {
-    while(1)
-    {   
-        vTaskSetTimeOutState( &xTimeOut3 );
-        printf("In Task 3 : periodicity : 5000\n");
+    printf("Created task 3, Periodicity = 5000ms\n");
+    my_timer_handle = xTimerCreate("my_timer", (10000 / portTICK_PERIOD_MS),pdFALSE,timer_Id,myTimerCallback);
 
-        while( xTaskCheckForTimeOut( &xTimeOut3, &task3) != pdFALSE) // add time stamp with defined time 
-        {
-             /* Timed out before the wanted number of bytes were available, exit the
-            loop. */
-            break;
-        }
-        
-         ulTaskNotifyTake( pdTRUE,task3);
+    xTimerStart(my_timer_handle, 1);
+    while (1)
+    {
+        printf("task3\n");
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
- }
-
+}
